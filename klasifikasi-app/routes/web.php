@@ -20,3 +20,6 @@ Route::get('/cek-python', function () {
 Route::post('/predict', [KnnController::class, 'predict']);
 
 Route::post('/predict-direct', [KnnController::class, 'predictDirect']);
+
+Route::post('/predict-multi-direct', [KnnController::class, 'predictDirectMulti']);
+Route::post('/predict-multi-flask', [KnnController::class, 'predictFlaskMulti']);
