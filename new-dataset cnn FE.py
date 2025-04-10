@@ -68,7 +68,7 @@ def crop_image(image, alpha):
     return cropped_image
 
 # Memasukkan jumlah jenis data
-num_classes = 3
+num_classes = 1
 
 # Dictionary untuk menyimpan folder dan label
 class_data = {}
@@ -222,4 +222,4 @@ for folder_path, class_name in class_data.items():
     print(f"Folder: {folder_path}, Label: {class_name}")
 
 # Simpan data dalam file CSV
-data.to_csv('dataset_GLCM_CNN.csv', index=False)
+data.to_csv('dataset_GLCM_CNN_210_shirt.csv', index=False)
