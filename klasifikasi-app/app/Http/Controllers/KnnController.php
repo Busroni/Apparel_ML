@@ -62,42 +62,48 @@ class KnnController extends Controller
 
     public function predictFlaskMulti(Request $request)
     {
-        set_time_limit(360); 
-        $python = "C:\\Users\\acer\\AppData\\Local\\Programs\\PythonCodingPack\\python.exe";
-        $script = base_path('python/predict.py');
-
-        $results = [];
         $startAll = microtime(true); // waktu mulai total
-
-        foreach ($request->file('image') as $file) {
+        $images = $request->file('image');
+        $results = [];
+    
+        foreach ($images as $image) {
             $start = microtime(true); // waktu mulai per gambar
-
-            // Simpan file ke storage/public/uploads
-            $path = $file->store('uploads', 'public');
-            $imagePath = public_path('storage/' . $path);
-
-            // Jalankan Python script
-            $command = "\"$python\" \"$script\" \"$imagePath\"";
-            $output = shell_exec($command);
-
+    
+            // Simpan gambar ke public storage
+            $path = $image->store('uploads', 'public');
+            $fullImagePath = storage_path('app/public/' . $path);
+            $publicPath = 'storage/' . $path;
+    
+            // Kirim ke Flask
+            $response = Http::attach(
+                'image',
+                file_get_contents($fullImagePath),
+                $image->getClientOriginalName()
+            )->post('http://127.0.0.1:5000/predict');
+    
             $end = microtime(true); // waktu selesai per gambar
             $duration = round($end - $start, 2); // detik
-
+    
+            // Ambil hasil prediksi
+            $prediction = $response->json()['prediction'] ?? 'Tidak ada hasil';
+    
             $results[] = [
-                'image' => 'storage/' . $path,
-                'prediction' => trim($output),
+                'image' => $publicPath,
+                'prediction' => $prediction,
                 'time' => $duration
             ];
         }
-
+    
         $endAll = microtime(true);
         $totalTime = round($endAll - $startAll, 2);
-
+    
         return view('upload', [
+            'type' => 'dengan Flask',
             'results' => $results,
             'totalTime' => $totalTime
         ]);
     }
+    
 
     public function predictDirectMulti(Request $request)
     {
