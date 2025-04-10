@@ -39,7 +39,7 @@ def extract_cnn_features(img_array):
     img = cv2.resize(img_array, (224, 224))
     x = np.expand_dims(img, axis=0)
     x = preprocess_input(x)
-    features = cnn_model.predict(x)
+    features = cnn_model.predict(x, verbose=0)
     return features.flatten()
 
 # Ambil path dari command-line argument
@@ -71,6 +71,7 @@ combined = np.concatenate((cnn, glcm))
 
 features_df = pd.DataFrame([combined], columns=feature_names)
 prediction = loaded_model.predict(features_df)
+
 
 # Cetak hasil ke stdout
 print(prediction[0])
