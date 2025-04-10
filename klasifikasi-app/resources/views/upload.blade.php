@@ -26,6 +26,24 @@
         </form>
     </div>
 
+    <div class="shadow-lg rounded-lg bg-teal-100 p-5 mt-15">
+        <h1 class="font-black text-4xl mb-10 ">Klasifikasi Gambar BATCH [DIRECT]</h1>
+        <form action="/predict-multi-direct" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input class="p-2 rounded-lg bg-amber-400 hover:cursor-pointer hover:bg-amber-600" type="file" name="image[]" multiple required>
+            <button type="submit" class="p-2 rounded-lg bg-blue-400 hover:cursor-pointer hover:bg-blue-800 hover:text-white">Klasifikasi Semua</button>
+        </form>
+    </div>
+
+    <div class="shadow-lg rounded-lg bg-blue-100 p-5 mt-15">
+        <h1 class="font-black text-4xl mb-10 ">Klasifikasi Gambar BATCH [FLASK]</h1>
+        <form action="/predict-multi-flask" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input class="p-2 rounded-lg bg-amber-400 hover:cursor-pointer hover:bg-amber-600" type="file" name="image[]" multiple required>
+            <button type="submit" class="p-2 rounded-lg bg-blue-400 hover:cursor-pointer hover:bg-blue-800 hover:text-white">Klasifikasi Semua</button>
+        </form>
+    </div>
+
     @if(isset($type))
         <div class="mt-5 bg-green-200 p-4 rounded-lg">
             <h2 class="text-xl font-bold">Hasil Percobaan {{ $type }}:</h2>
@@ -51,26 +69,22 @@
         </div>
     @endif
 
-    <script>
-        window.addEventListener('DOMContentLoaded', function () {
-            let startTime = 0;
-    
-            const form = document.getElementById('direct-form');
-            const timeDiv = document.getElementById('response-time');
-    
-            if (form) {
-                form.addEventListener('submit', function () {
-                    startTime = performance.now();
-                });
-            }
-    
-            if (startTime > 0 && timeDiv) {
-                const endTime = performance.now();
-                const duration = (endTime - startTime) / 1000;
-                timeDiv.textContent = `⏱️ Response Time: ${duration.toFixed(2)} seconds`;
-            }
-        });
-    </script>
+    {{-- ------------------------------ --}}
+    @if(isset($results))
+        <h2 class="text-xl font-bold mt-10">Hasil Klasifikasi:</h2>
+        @foreach($results as $result)
+            <div class="my-4">
+                <img src="{{ asset($result['image']) }}" alt="Gambar" width="200">
+                <p>Prediksi: <strong>{{ $result['prediction'] }}</strong></p>
+                <p>Waktu proses: {{ $result['time'] }} detik</p>
+            </div>
+        @endforeach
+
+        <div class="mt-8 bg-blue-200 p-3 rounded-md">
+            <strong>Total waktu klasifikasi:</strong> {{ $totalTime }} detik
+        </div>
+    @endif
+
     
 </body>
 </html>
