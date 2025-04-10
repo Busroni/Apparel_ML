@@ -19,19 +19,4 @@ Route::get('/cek-python', function () {
 
 Route::post('/predict', [KnnController::class, 'predict']);
 
-Route::post('/predict-direct', function (Request $request) {
-    $python = "C:\\Users\\acer\\AppData\\Local\\Programs\\PythonCodingPack\\python.exe";
-
-    // Simpan gambar ke storage
-    $path = $request->file('image')->store('uploads', 'public');
-    $imagePath = public_path('storage/' . $path);
-
-    // File Python dipindahkan ke folder 'python' di root project
-    $script = base_path('python/predict.py');
-
-    // Jalankan script
-    $command = "\"$python\" \"$script\" \"$imagePath\"";
-    $output = shell_exec($command);
-
-    return "<pre>$output</pre>";
-});
+Route::post('/predict-direct', [KnnController::class, 'predictDirect']);
