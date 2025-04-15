@@ -5,7 +5,7 @@ import torchvision.models as models
 model = models.resnet50(weights=None)  # No pretrained weights, we’ll load custom weights
 
 # Modify the fully connected layer to match the checkpoint (5 classes)
-num_classes = 5
+num_classes = 4
 model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
 
 # Load the .pth file with weights_only=True for safety

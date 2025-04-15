@@ -3,6 +3,9 @@ import torch.nn as nn
 from torchvision import models, transforms
 from PIL import Image
 import numpy as np
+import io
+
+from rembg import remove
 
 # Define device (use GPU if available, else CPU)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -11,7 +14,25 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 CLASSES = ['dress', 'pants', 'shoes', 'shirts'] 
 
 # Define the image preprocessing pipeline (same as notebook)
+# Remove Background
+class RemoveBackground:
+    def __init__(self):
+        pass
+    
+    def __call__(self, img):
+        # Convert PIL image to bytes
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format='PNG')
+        img_byte_arr = img_byte_arr.getvalue()
+        
+        # Remove background
+        output = remove(img_byte_arr)
+        
+        # Convert back to PIL Image
+        return Image.open(io.BytesIO(output)).convert('RGB')
+
 preprocess = transforms.Compose([
+    RemoveBackground(),
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -32,7 +53,7 @@ def load_model(model_path):
         model = models.resnet50(weights=None)  # No pretrained weights, we’ll load custom weights
 
         # Modify the fully connected layer to match the checkpoint (5 classes)
-        num_classes = 5
+        num_classes = 4
         model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
 
         # Load the .pth file with weights_only=True for safety
@@ -93,7 +114,8 @@ def main():
     model_path = 'resnet50_clothing_classifier.pth'
     
     # Example image path (replace with your image path)
-    image_path = 'sh2.jpg'
+    image_path = 'pn2.jpg'
+
     
     # Load the model
     model = load_model(model_path)
@@ -106,6 +128,7 @@ def main():
     
     if predicted_class is not None:
         print(f"\nPredicted Class: {predicted_class}")
+        print("File Name : ", image_path)
         print("Confidence Scores:")
         for class_name, score in confidence_scores.items():
             print(f"  {class_name}: {score:.4f}")
